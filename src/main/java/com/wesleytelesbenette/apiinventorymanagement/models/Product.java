@@ -44,7 +44,8 @@ public class Product
      * @NotNull A categoria do produto não pode ser nula.
      */
     @NotNull(message = "A categoria do produto não pode ser nula.")
-    @Column(name = "category")
+    @ManyToOne
+    @JoinColumn(name = "category_id")
     private Category category;
 
     /**
