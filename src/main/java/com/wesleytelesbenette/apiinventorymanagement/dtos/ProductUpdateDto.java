@@ -24,17 +24,17 @@ public class ProductUpdateDto
      * @Size(min=1,max=30) O nome do produto só pode ter entre 1 e 30 caracteres.
      */
     @Size(min = 1, max = 30, message = "O nome do produto só pode ter entre 1 e 30 caracteres.")
-    private String name;
+    private String name = null;
 
     /**
      * A descrição do produto.
      */
-    private String description;
+    private String description = null;
 
     /**
      * Categoria do produto.
      */
-    private Category category;
+    private Category category = null;
 
     /**
      * O nome da categoria do produto.
@@ -42,7 +42,7 @@ public class ProductUpdateDto
      * @Size(min=1,max=30) O nome da categoria só pode ter entre 1 e 30 caracteres.
      */
     @Size(min = 1, max = 30, message = "O nome da categoria só pode ter entre 1 e 30 caracteres.")
-    private String categoryName;
+    private String categoryName = null;
 
     /**
      * O preço do produto.
@@ -50,7 +50,7 @@ public class ProductUpdateDto
      * @Size(min=0.0) O preço do produto não pode ser menor que "0.0".
      */
     @DecimalMin(value = "0.0", message = "O preço do produto não pode ser menor que \"0.0\".")
-    private Double price;
+    private Double price = null;
 
     /**
      * A quantidade do produto em estoque.
@@ -58,5 +58,5 @@ public class ProductUpdateDto
      * @Size(min=0) A quantidade do produto em estoque não pode ser menor que 0.
      */
     @Min(value = 0, message = "A quantidade do produto em estoque não pode ser menor que 0.")
-    private Integer amountStock;
+    private Integer amountStock = null;
 }

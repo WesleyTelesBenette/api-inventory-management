@@ -1,6 +1,7 @@
 package com.wesleytelesbenette.apiinventorymanagement.models;
 
-import com.wesleytelesbenette.apiinventorymanagement.dtos.ProductDto;
+import com.wesleytelesbenette.apiinventorymanagement.dtos.ProductCreateDto;
+import com.wesleytelesbenette.apiinventorymanagement.dtos.ProductUpdateDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -72,13 +73,27 @@ public class Product
     private Integer amountStock;
 
     /**
-     * Construtor baseado num DTO.
+     * Construtor baseado num DTO para requisições POST.
      *
-     * @param newProduct Objeto ProductDto com os dados do produto.
+     * @param newProduct Objeto ProductCreateDto com os dados do produto.
      */
-    public Product(ProductDto newProduct)
+    public Product(ProductCreateDto newProduct)
     {
-        if (newProduct.getId() != null) this.id = newProduct.getId();
+        this.name = newProduct.getName();
+        this.description = newProduct.getDescription();
+        this.category = newProduct.getCategory();
+        this.price = newProduct.getPrice();
+        this.amountStock = newProduct.getAmountStock();
+    }
+
+    /**
+     * Construtor baseado num DTO para requisições PUT.
+     *
+     * @param newProduct Objeto ProductUpdateDto com os dados do produto.
+     */
+    public Product(ProductUpdateDto newProduct)
+    {
+        this.id = newProduct.getId();
         this.name = newProduct.getName();
         this.description = newProduct.getDescription();
         this.category = newProduct.getCategory();

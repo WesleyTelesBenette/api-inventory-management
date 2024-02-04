@@ -1,6 +1,9 @@
 package com.wesleytelesbenette.apiinventorymanagement.controllers;
 
+import com.wesleytelesbenette.apiinventorymanagement.dtos.ProductCreateDto;
+import com.wesleytelesbenette.apiinventorymanagement.dtos.ProductUpdateDto;
 import com.wesleytelesbenette.apiinventorymanagement.models.Product;
+import com.wesleytelesbenette.apiinventorymanagement.repositories.CategoryRepository;
 import com.wesleytelesbenette.apiinventorymanagement.repositories.ProductRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,54 +20,148 @@ import java.util.Optional;
 public class ProductController
 {
     private ProductRepository productRepository;
+    private CategoryRepository categoryRepository;
 
     @Autowired
-    public ProductController(ProductRepository rep)
+    public ProductController(ProductRepository repP, CategoryRepository repC)
     {
-        this.productRepository = rep;
+        this.productRepository = repP;
+        this.categoryRepository = repC;
     }
 
     @GetMapping("/")
     public ResponseEntity<List<Product>> getProducts()
     {
-        List<Product> responseList = productRepository.findAllByOrderByNameAsc();
-        return new ResponseEntity<>(responseList, HttpStatus.OK);
+        try
+        {
+            List<Product> responseList = productRepository.findAllByOrderByNameAsc();
+            return new ResponseEntity<>(responseList, HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductId(@PathVariable Long id)
     {
-        Optional<Product> optionalProduct = productRepository.findById(id);
-        boolean query = optionalProduct.isPresent();
+        try
+        {
+            Optional<Product> optionalProduct = productRepository.findById(id);
+            boolean query = optionalProduct.isPresent();
 
-        Product responseProduct = (query) ? optionalProduct.get() : null;
-        HttpStatus responseHttp = (query) ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+            Product responseProduct = (query) ? optionalProduct.get() : null;
+            HttpStatus responseHttp = (query) ? HttpStatus.OK : HttpStatus.NOT_FOUND;
 
-        return new ResponseEntity<>(responseProduct, responseHttp);
+            return new ResponseEntity<>(responseProduct, responseHttp);
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/")
-    public ResponseEntity<String> createProduct(@Valid @RequestBody Product a)
+    public ResponseEntity<Product> createProduct(@Valid @RequestBody ProductCreateDto dto)
     {
-        //Em produção...
-        return new ResponseEntity<>("", HttpStatus.CREATED);
+        try
+        {
+            Product responseProduct = productRepository.save(new Product(dto));
+            HttpStatus responseHttp = (responseProduct != null) ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
+
+            return new ResponseEntity<>(responseProduct, responseHttp);
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("/")
+    public ResponseEntity<Product> updateProduct(@Valid @RequestBody ProductUpdateDto dto)
+    {
+        try
+        {
+            Product responseProduct = null;
+            HttpStatus responseHttp = HttpStatus.NOT_FOUND;
+
+            if (productRepository.findById(dto.getId()) != null)
+            {
+                Product newProduct = repairProductUpdate(dto);
+                responseProduct = productRepository.save(newProduct);
+                responseHttp = (responseProduct != null) ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+            }
+
+            return new ResponseEntity<>(responseProduct, responseHttp);
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    private Product repairProductUpdate(ProductUpdateDto dto)
+    {
+        Product productRepair = new Product();
+        Long productId = dto.getId();
+
+        productRepair.setId(productId);
+
+        productRepair.setName(
+            (dto.getName() != null)
+                ? dto.getName()
+                : productRepository.findById(productId).get().getName()
+        );
+
+        productRepair.setDescription(
+            (dto.getDescription() != null)
+                ? dto.getDescription()
+                : productRepository.findById(productId).get().getDescription()
+        );
+
+        productRepair.setCategory(
+            (dto.getCategoryName() != null)
+                ? categoryRepository.findByName(dto.getCategoryName())
+                : productRepository.findById(productId).get().getCategory()
+        );
+
+        productRepair.setPrice(
+            (dto.getPrice() != null)
+                ? dto.getPrice()
+                : productRepository.findById(productId).get().getPrice()
+        );
+
+        productRepair.setAmountStock(
+                (dto.getAmountStock() != null)
+                        ? dto.getAmountStock()
+                        : productRepository.findById(productId).get().getAmountStock()
+        );
+
+        return productRepair;
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProductId(@PathVariable Long id)
     {
-        String responseMessage = "O id fornecido não pertence a nenhum produto.";
-        HttpStatus responseHttp = HttpStatus.NOT_FOUND;
-
-        if(productRepository.findById(id).isPresent())
+        try
         {
-            productRepository.deleteById(id);
-            boolean productDeleteFailed = productRepository.findById(id).isPresent();
+            String responseMessage = "";
+            HttpStatus responseHttp = HttpStatus.NOT_FOUND;
 
-            responseMessage = (productDeleteFailed) ? "Algo deu errado..." : "Produto deletado com sucesso!";
-            responseHttp = (productDeleteFailed) ? HttpStatus.BAD_REQUEST : HttpStatus.OK;
+            if (productRepository.findById(id).isPresent()) {
+                productRepository.deleteById(id);
+                boolean productDeleteFailed = productRepository.findById(id).isPresent();
+
+                responseMessage = (productDeleteFailed) ? "Algo deu errado..." : "Produto deletado com sucesso!";
+                responseHttp = (productDeleteFailed) ? HttpStatus.BAD_REQUEST : HttpStatus.OK;
+            }
+
+            return new ResponseEntity<>(responseMessage, responseHttp);
         }
-
-        return new ResponseEntity<>(responseMessage, responseHttp);
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
