@@ -3,15 +3,19 @@ package com.wesleytelesbenette.apiinventorymanagement.dtos;
 import com.wesleytelesbenette.apiinventorymanagement.models.Category;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
-public class ProductDto
+public class ProductUpdateDto
 {
     /**
      * O identificador único do produto.
+     *
+     * @NotNull O id do produto não pode ser nulo.
      */
+    @NotNull
     private Long id;
 
     /**
