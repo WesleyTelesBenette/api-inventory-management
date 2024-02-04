@@ -2,6 +2,7 @@ package com.wesleytelesbenette.apiinventorymanagement.controllers;
 
 import com.wesleytelesbenette.apiinventorymanagement.models.Product;
 import com.wesleytelesbenette.apiinventorymanagement.repositories.ProductRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +43,8 @@ public class ProductController
         return new ResponseEntity<>(responseProduct, responseHttp);
     }
 
-    //@PostMapping("/")
-    public ResponseEntity<String> createProduct()
+    @PostMapping("/")
+    public ResponseEntity<String> createProduct(@Valid @RequestBody Product a)
     {
         //Em produção...
         return new ResponseEntity<>("", HttpStatus.CREATED);

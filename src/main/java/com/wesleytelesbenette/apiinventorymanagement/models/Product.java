@@ -1,5 +1,6 @@
 package com.wesleytelesbenette.apiinventorymanagement.models;
 
+import com.wesleytelesbenette.apiinventorymanagement.dtos.ProductDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -69,4 +70,19 @@ public class Product
     @Min(value = 0, message = "A quantidade do produto em estoque não pode ser menor que 0.")
     @Column(name = "amount_stock")
     private Integer amountStock;
+
+    /**
+     * Construtor baseado num DTO.
+     *
+     * @param newProduct Objeto ProductDto com os dados do produto.
+     */
+    public Product(ProductDto newProduct)
+    {
+        if (newProduct.getId() != null) this.id = newProduct.getId();
+        this.name = newProduct.getName();
+        this.description = newProduct.getDescription();
+        this.category = newProduct.getCategory();
+        this.price = newProduct.getPrice();
+        this.amountStock = newProduct.getAmountStock();
+    }
 }
