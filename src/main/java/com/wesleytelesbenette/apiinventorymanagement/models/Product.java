@@ -73,6 +73,20 @@ public class Product
     private Integer amountStock;
 
     /**
+     * Construtor baseado num Prodcut para requisições gerais.
+     *
+     * @param newProduct Objeto Product com os dados do produto.
+     */
+    public Product(Product newProduct)
+    {
+        this.name = newProduct.getName();
+        this.description = newProduct.getDescription();
+        this.category = newProduct.getCategory();
+        this.price = newProduct.getPrice();
+        this.amountStock = newProduct.getAmountStock();
+    }
+
+    /**
      * Construtor baseado num DTO para requisições POST.
      *
      * @param newProduct Objeto ProductCreateDto com os dados do produto.

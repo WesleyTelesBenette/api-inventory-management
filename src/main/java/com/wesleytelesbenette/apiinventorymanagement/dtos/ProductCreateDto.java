@@ -8,11 +8,6 @@ import lombok.Getter;
 public class ProductCreateDto
 {
     /**
-     * O identificador único do produto.
-     */
-    private Long id;
-
-    /**
      * O nome do produto.
      *
      * @NotEmpty O nome do produto não pode estar em branco.
@@ -25,7 +20,7 @@ public class ProductCreateDto
     /**
      * A descrição do produto.
      */
-    private String description;
+    private String description = "";
 
     /**
      * Categoria do produto.
@@ -35,8 +30,10 @@ public class ProductCreateDto
     /**
      * O nome da categoria do produto.
      *
+     * @NotEmpty O nome da categoria não pode estar em branco
      * @Size(min=1,max=30) O nome da categoria só pode ter entre 1 e 30 caracteres.
      */
+    @NotBlank(message = "O nome da categoria não pode estar em branco.")
     @Size(min = 1, max = 30, message = "O nome da categoria só pode ter entre 1 e 30 caracteres.")
     private String categoryName;
 

@@ -9,14 +9,14 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Controller
-@RequestMapping(value = "/product")
+@RestController
+@RequestMapping("/product")
 public class ProductController
 {
     private ProductRepository productRepository;
@@ -29,7 +29,7 @@ public class ProductController
         this.categoryRepository = repC;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<Product>> getProducts()
     {
         try
@@ -62,13 +62,16 @@ public class ProductController
         }
     }
 
-    @PostMapping("/")
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody ProductCreateDto dto)
+    @PostMapping
+    public ResponseEntity<Product> createProduct(@RequestBody @Valid ProductCreateDto dto)
     {
         try
         {
-            Product responseProduct = productRepository.save(new Product(dto));
-            HttpStatus responseHttp = (responseProduct != null) ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
+            Product newProduct = new Product(dto);
+            newProduct.setCategory(categoryRepository.findByName(dto.getCategoryName()));
+
+            Product responseProduct = productRepository.save(new Product(newProduct));
+            HttpStatus responseHttp = HttpStatus.CREATED;
 
             return new ResponseEntity<>(responseProduct, responseHttp);
         }
@@ -78,7 +81,7 @@ public class ProductController
         }
     }
 
-    @PutMapping("/")
+    @PutMapping
     public ResponseEntity<Product> updateProduct(@Valid @RequestBody ProductUpdateDto dto)
     {
         try
@@ -86,11 +89,11 @@ public class ProductController
             Product responseProduct = null;
             HttpStatus responseHttp = HttpStatus.NOT_FOUND;
 
-            if (productRepository.findById(dto.getId()) != null)
+            if (productRepository.findById(dto.getId()).isPresent())
             {
                 Product newProduct = repairProductUpdate(dto);
                 responseProduct = productRepository.save(newProduct);
-                responseHttp = (responseProduct != null) ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+                responseHttp = HttpStatus.OK;
             }
 
             return new ResponseEntity<>(responseProduct, responseHttp);

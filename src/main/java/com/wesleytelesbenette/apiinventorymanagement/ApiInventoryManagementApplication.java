@@ -10,5 +10,4 @@ public class ApiInventoryManagementApplication
 	{
 		SpringApplication.run(ApiInventoryManagementApplication.class, args);
 	}
-
 }
