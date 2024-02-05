@@ -27,10 +27,10 @@ public class Product
      * O nome do produto.
      *
      * @NotEmpty O nome do produto não pode estar em branco.
-     * @Size(min=1,max=30) O nome do produto só pode ter entre 1 e 30 caracteres.
+     * @Size(min=1,max=50) O nome do produto só pode ter entre 1 e 50 caracteres.
      */
     @NotBlank(message = "O nome do produto não pode estar em branco.")
-    @Size(min = 1, max = 30, message = "O nome do produto só pode ter entre 1 e 30 caracteres.")
+    @Size(min = 1, max = 50, message = "O nome do produto só pode ter entre 1 e 50 caracteres.")
     @Column(name = "name")
     private String name;
 

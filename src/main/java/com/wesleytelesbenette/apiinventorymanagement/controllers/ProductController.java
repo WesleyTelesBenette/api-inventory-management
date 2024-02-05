@@ -100,6 +100,7 @@ public class ProductController
         }
         catch (Exception e)
         {
+            System.err.println("Erro ao salvar o produto: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
