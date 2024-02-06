@@ -32,4 +32,9 @@ public class Category
     @Size(min = 1, max = 30, message = "O nome da categoria só pode ter entre 1 e 30 caracteres.")
     @Column(name = "name")
     private String name;
+
+    public Category(String name)
+    {
+        this.name = name;
+    }
 }
