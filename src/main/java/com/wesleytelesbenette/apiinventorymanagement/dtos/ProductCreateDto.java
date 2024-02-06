@@ -23,11 +23,6 @@ public class ProductCreateDto
     private String description = "";
 
     /**
-     * Categoria do produto.
-     */
-    private Category category;
-
-    /**
      * O nome da categoria do produto.
      *
      * @NotEmpty O nome da categoria não pode estar em branco

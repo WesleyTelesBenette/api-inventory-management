@@ -95,23 +95,8 @@ public class Product
     {
         this.name = newProduct.getName();
         this.description = newProduct.getDescription();
-        this.category = newProduct.getCategory();
         this.price = newProduct.getPrice();
         this.amountStock = newProduct.getAmountStock();
     }
 
-    /**
-     * Construtor baseado num DTO para requisições PUT.
-     *
-     * @param newProduct Objeto ProductUpdateDto com os dados do produto.
-     */
-    public Product(ProductUpdateDto newProduct)
-    {
-        this.id = newProduct.getId();
-        this.name = newProduct.getName();
-        this.description = newProduct.getDescription();
-        this.category = newProduct.getCategory();
-        this.price = newProduct.getPrice();
-        this.amountStock = newProduct.getAmountStock();
-    }
 }

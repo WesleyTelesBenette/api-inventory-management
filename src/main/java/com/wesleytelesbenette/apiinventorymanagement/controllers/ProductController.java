@@ -7,13 +7,11 @@ import com.wesleytelesbenette.apiinventorymanagement.repositories.CategoryReposi
 import com.wesleytelesbenette.apiinventorymanagement.repositories.ProductRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/product")
@@ -34,12 +32,14 @@ public class ProductController
     {
         try
         {
-            List<Product> responseList = productRepository.findAllByOrderByNameAsc();
-            return new ResponseEntity<>(responseList, HttpStatus.OK);
+            return (productRepository.count() == 0)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(productRepository.findAllByOrderByNameAsc());
         }
         catch (Exception e)
         {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            System.err.println("Ops... ocorreu um erro na consulta dos produtos: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -48,17 +48,14 @@ public class ProductController
     {
         try
         {
-            Optional<Product> optionalProduct = productRepository.findById(id);
-            boolean query = optionalProduct.isPresent();
-
-            Product responseProduct = (query) ? optionalProduct.get() : null;
-            HttpStatus responseHttp = (query) ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-
-            return new ResponseEntity<>(responseProduct, responseHttp);
+            return productRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
         }
         catch (Exception e)
         {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            System.err.println("Ops... ocorreu um erro na consulta do produto: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -67,17 +64,23 @@ public class ProductController
     {
         try
         {
-            Product newProduct = new Product(dto);
-            newProduct.setCategory(categoryRepository.findByName(dto.getCategoryName()));
+            return categoryRepository.findByNameOp(dto.getCategoryName())
+                .map(categoryFound ->
+                    {
+                        Product newProduct = new Product(dto);
+                        newProduct.setCategory(categoryFound);
+                        Product saveProduct = productRepository.save(newProduct);
 
-            Product responseProduct = productRepository.save(new Product(newProduct));
-            HttpStatus responseHttp = HttpStatus.CREATED;
-
-            return new ResponseEntity<>(responseProduct, responseHttp);
+                        return ResponseEntity
+                            .created(URI.create("/product/" + saveProduct.getId()))
+                            .body(saveProduct);
+                    }
+                ).orElseGet(() -> ResponseEntity.notFound().build());
         }
         catch (Exception e)
         {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            System.err.println("Ops... ocorreu um erro na criação do produto: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -86,22 +89,18 @@ public class ProductController
     {
         try
         {
-            Product responseProduct = null;
-            HttpStatus responseHttp = HttpStatus.NOT_FOUND;
-
-            if (productRepository.findById(dto.getId()).isPresent())
-            {
-                Product newProduct = repairProductUpdate(dto);
-                responseProduct = productRepository.save(newProduct);
-                responseHttp = HttpStatus.OK;
-            }
-
-            return new ResponseEntity<>(responseProduct, responseHttp);
+            return productRepository.findById(dto.getId())
+                .map(productFound ->
+                    {
+                        Product newProduct = repairProductUpdate(dto);
+                        return ResponseEntity.ok(productRepository.save(newProduct));
+                    }
+                ).orElseGet(() -> ResponseEntity.notFound().build());
         }
         catch (Exception e)
         {
-            System.err.println("Erro ao salvar o produto: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            System.err.println("Ops... ocorreu um erro na atualização do produto: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -146,26 +145,22 @@ public class ProductController
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProductId(@PathVariable Long id)
+    public ResponseEntity deleteProductId(@PathVariable Long id)
     {
         try
         {
-            String responseMessage = "";
-            HttpStatus responseHttp = HttpStatus.NOT_FOUND;
-
-            if (productRepository.findById(id).isPresent()) {
-                productRepository.deleteById(id);
-                boolean productDeleteFailed = productRepository.findById(id).isPresent();
-
-                responseMessage = (productDeleteFailed) ? "Algo deu errado..." : "Produto deletado com sucesso!";
-                responseHttp = (productDeleteFailed) ? HttpStatus.BAD_REQUEST : HttpStatus.OK;
-            }
-
-            return new ResponseEntity<>(responseMessage, responseHttp);
+            return productRepository.findById(id)
+                .map(productFound ->
+                    {
+                        productRepository.delete(productFound);
+                        return ResponseEntity.ok().build();
+                    }
+                ).orElseGet(() -> ResponseEntity.notFound().build());
         }
         catch (Exception e)
         {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            System.err.println("Ops... ocorreu um erro na exclusão do produto: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

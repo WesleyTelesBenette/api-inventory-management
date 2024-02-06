@@ -32,11 +32,6 @@ public class ProductUpdateDto
     private String description = null;
 
     /**
-     * Categoria do produto.
-     */
-    private Category category = null;
-
-    /**
      * O nome da categoria do produto.
      *
      * @Size(min=1,max=30) O nome da categoria só pode ter entre 1 e 30 caracteres.

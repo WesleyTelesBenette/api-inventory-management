@@ -11,8 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -34,29 +36,50 @@ public class CategoryController
     {
         try
         {
-            List<Category> responseList = categoryRepository.findAll();
-            return new ResponseEntity<>(responseList, HttpStatus.OK);
+            return (categoryRepository.count() == 0)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(categoryRepository.findAll());
         }
         catch (Exception e)
         {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            System.err.println("Ops... ocorreu um erro na consulta das categorias: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Category> getCategoryId(@PathVariable Long id)
+    {
+        try
+        {
+            return categoryRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
+        }
+        catch (Exception e)
+        {
+            System.err.println("Ops... ocorreu um erro na consulta da categoria: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 
     @PostMapping("/{category}")
-    public ResponseEntity<Category> createCategory(@PathVariable String category)
+    public ResponseEntity<Category> createCategory(@PathVariable String newCategory)
     {
         try
         {
-            if (categoryRepository.findByName(category) != null)
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            if (categoryRepository.existsByName(newCategory))
+                return ResponseEntity.badRequest().build();
 
-            Category responseCategory = categoryRepository.save(new Category(category));
-            return new ResponseEntity<>(responseCategory, HttpStatus.CREATED);
+            Category saveCategory = categoryRepository.save(new Category(newCategory));
+            return ResponseEntity
+                    .created(URI.create("/category/" + saveCategory.getId()))
+                    .body(saveCategory);
         }
         catch (Exception e)
         {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            System.err.println("Ops... ocorreu um erro na criação da categoria: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -65,23 +88,22 @@ public class CategoryController
     {
         try
         {
-            if (categoryRepository.findByName(dto.getOldCategory()) == null)
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            if (categoryRepository.existsByName(dto.getNewCategory()))
+                return ResponseEntity.badRequest().build(); //Already exists
 
-            if (categoryRepository.findByName(dto.getNewCategory()) != null)
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return categoryRepository.findByNameOp(dto.getOldCategory())
+                .map(categoryUpdate ->
+                    {
+                        categoryUpdate.setName(dto.getNewCategory());
+                        categoryRepository.save(categoryUpdate);
 
-            Category category = categoryRepository.findByName(dto.getOldCategory());
-            category.setName(dto.getNewCategory());
-            categoryRepository.save(category);
+                        List<Product> productsWithCategory = productRepository.findByCategory(categoryUpdate);
+                        for (Product prod : productsWithCategory) prod.setCategory(categoryUpdate);
+                        productRepository.saveAll(productsWithCategory);
 
-            List<Product> productsWithCategory = productRepository.findByCategory(category);
-            for (Product prod : productsWithCategory) {
-                prod.setCategory(category);
-            }
-            productRepository.saveAll(productsWithCategory);
-
-            return new ResponseEntity<>(category, HttpStatus.OK);
+                        return ResponseEntity.ok(categoryUpdate);
+                    }
+                ).orElseGet(() -> ResponseEntity.notFound().build());
         }
         catch (Exception e)
         {
