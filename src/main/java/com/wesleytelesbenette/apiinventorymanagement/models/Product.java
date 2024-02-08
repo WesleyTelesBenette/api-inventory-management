@@ -68,7 +68,7 @@ public class Product
      */
     @NotNull(message = "A quantidade do produto em estoque não pode ser nula.")
     @Min(value = 0, message = "A quantidade do produto em estoque não pode ser menor que 0.")
-    @Column(name = "amount_stock")
+    @Column(name = "amountStock")
     private Integer amountStock;
 
     /**
@@ -97,5 +97,4 @@ public class Product
         this.price = newProduct.getPrice();
         this.amountStock = newProduct.getAmountStock();
     }
-
 }
