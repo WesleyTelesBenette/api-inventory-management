@@ -1,14 +1,15 @@
-FROM ubunto:latest AS build
+FROM ubuntu:latest AS build
 
 RUN apt-get update
 RUN apt-get install openjdk-17-jdk -y
-COPY . .
 
 RUN apt-get install maven -y
 RUN mvn clean install
 RUN mvn package
 
-FROM openjdk:21-jdk-slim
+COPY . .
+
+FROM openjdk:17-jdk-slim
 
 EXPOSE 8080
 
