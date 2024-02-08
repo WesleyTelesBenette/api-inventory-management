@@ -99,24 +99,31 @@ public class CategoryController
         }
         catch (Exception e)
         {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            System.err.println("Ops... ocorreu um erro na atualização da categoria: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteCategory(@PathVariable Long id)
+    public ResponseEntity<Category> deleteCategory(@PathVariable Long id)
     {
         try
         {
-            if (categoryRepository.findById(id).isEmpty())
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            if (productRepository.findByCategoryId(id).isPresent())
+                return ResponseEntity.badRequest().build();
 
-            categoryRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return categoryRepository.findById(id)
+                .map(categoryFound ->
+                    {
+                        categoryRepository.deleteById(id);
+                        return ResponseEntity.ok(categoryFound);
+                    }
+                ).orElseGet(() -> ResponseEntity.notFound().build());
         }
         catch (Exception e)
         {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            System.err.println("Ops... ocorreu um erro na exclusão da categoria: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

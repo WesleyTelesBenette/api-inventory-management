@@ -3,8 +3,10 @@ package com.wesleytelesbenette.apiinventorymanagement.controllers;
 import com.wesleytelesbenette.apiinventorymanagement.dtos.ProductCreateDto;
 import com.wesleytelesbenette.apiinventorymanagement.dtos.ProductUpdateDto;
 import com.wesleytelesbenette.apiinventorymanagement.models.Product;
+import com.wesleytelesbenette.apiinventorymanagement.models.Promotion;
 import com.wesleytelesbenette.apiinventorymanagement.repositories.CategoryRepository;
 import com.wesleytelesbenette.apiinventorymanagement.repositories.ProductRepository;
+import com.wesleytelesbenette.apiinventorymanagement.repositories.PromotionRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +21,14 @@ public class ProductController
 {
     private ProductRepository productRepository;
     private CategoryRepository categoryRepository;
+    private PromotionRepository promotionRepository;
 
     @Autowired
-    public ProductController(ProductRepository repP, CategoryRepository repC)
+    public ProductController(ProductRepository repP, CategoryRepository repC, ProductRepository repM)
     {
         this.productRepository = repP;
         this.categoryRepository = repC;
+        this.productRepository = repM;
     }
 
     @GetMapping
@@ -145,15 +149,18 @@ public class ProductController
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteProductId(@PathVariable Long id)
+    public ResponseEntity<Product> deleteProductId(@PathVariable Long id)
     {
         try
         {
             return productRepository.findById(id)
                 .map(productFound ->
                     {
+                        Promotion productHasPromotion = promotionRepository.findByPromotion(id).get();
+                        promotionRepository.deleteById(productHasPromotion.getId());
+
                         productRepository.delete(productFound);
-                        return ResponseEntity.ok().build();
+                        return ResponseEntity.ok(productFound);
                     }
                 ).orElseGet(() -> ResponseEntity.notFound().build());
         }
