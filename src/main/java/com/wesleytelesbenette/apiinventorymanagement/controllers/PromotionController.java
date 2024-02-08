@@ -167,12 +167,12 @@ public class PromotionController
         try
         {
             return promotionRepository.findById(id)
-                    .map(promotionFound ->
-                        {
-                            promotionRepository.deleteById(id);
-                            return ResponseEntity.ok(promotionFound);
-                        }
-                    ).orElseGet(() -> ResponseEntity.notFound().build());
+                .map(promotionFound ->
+                    {
+                        promotionRepository.deleteById(id);
+                        return ResponseEntity.ok(promotionFound);
+                    }
+                ).orElseGet(() -> ResponseEntity.notFound().build());
         }
         catch (Exception e)
         {
