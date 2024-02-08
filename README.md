@@ -14,7 +14,7 @@ Para a criação da API foi escolhido a [**arquitetura monolítica**](https://mi
 <img src="https://github.com/WesleyTelesBenette/my-sources-for-docs/blob/main/api-inventory-management/arquitetura.svg" width="600" />
 
 ## 🗃️ Modelagem do Banco de Dados
-O banco de dados foi construído com [**PostgreSQL**](https://www.postgresql.org/), não por características exclusivas da solução, mas de fato pelo meu servidor de hospedagem só comportar essa tecnologia, o que também não quer dizer que não seja escolha adequada, o PostgreSQL possui recursos mais do que suficientes para um sistema como essa API.
+O banco de dados foi construído com [**PostgreSQL**](https://www.postgresql.org/), não por características exclusivas da solução, mas de fato pelo meu servidor de hospedagem só comportar essa tecnologia, o que também não quer dizer que não seja um escolha adequada, o PostgreSQL possui recursos mais do que suficientes para um sistema como esse.
 
 Numa visão geral, essa base de dados é composta por 3 tabelas: **Produtos**, **Categorias** e **Promoções**. E baseado nelas, a API consegue realizar todas suas funções de gerenciamento de estoque.
 
@@ -46,6 +46,6 @@ Ps. Foi analizado e decidido que, no contexto específico dessa aplicação, um 
 - GET: "/promotion/promotion/{id}" - Uma promoção buscada por ID.
 - GET: "/promotion/percentage/{id}" - A porcentagem de desconto de uma promoção buscada por ID.
 - GET: "/promotion/value/{id}" - O preço final calculado do produto de uma promoção buscada por ID.
-- POST: "/promotion/{newCategory}" - Criar uma promoção com body de [PromotionCreateDto](https://github.com/WesleyTelesBenette/api-inventory-management/blob/master/src/main/java/com/wesleytelesbenette/apiinventorymanagement/dtos/PromotionCreateDto.java).
+- POST: "/promotion" - Criar uma promoção com body de [PromotionCreateDto](https://github.com/WesleyTelesBenette/api-inventory-management/blob/master/src/main/java/com/wesleytelesbenette/apiinventorymanagement/dtos/PromotionCreateDto.java).
 - PUT: "/promotion" - Atualizar uma promoção com body de [PromotionUpdateDto](https://github.com/WesleyTelesBenette/api-inventory-management/blob/master/src/main/java/com/wesleytelesbenette/apiinventorymanagement/dtos/PromotionUpdateDto.java).
 - DELETE: "/promotion/{id}" - Deletar uma promoção por ID.
