@@ -33,6 +33,11 @@ public class Category
     @Column(name = "name")
     private String name;
 
+    /**
+     * Construtor baseado num nome.
+     *
+     * @param name Nome da nova categoria.
+     */
     public Category(String name)
     {
         this.name = name;

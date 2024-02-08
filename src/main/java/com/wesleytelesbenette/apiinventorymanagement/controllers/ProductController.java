@@ -136,9 +136,9 @@ public class ProductController
         );
 
         productRepair.setAmountStock(
-                (dto.getAmountStock() != null)
-                        ? dto.getAmountStock()
-                        : productRepository.findById(productId).get().getAmountStock()
+            (dto.getAmountStock() != null)
+                ? dto.getAmountStock()
+                : productRepository.findById(productId).get().getAmountStock()
         );
 
         return productRepair;

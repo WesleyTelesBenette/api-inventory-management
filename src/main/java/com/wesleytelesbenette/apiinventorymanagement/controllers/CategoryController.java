@@ -2,7 +2,6 @@ package com.wesleytelesbenette.apiinventorymanagement.controllers;
 
 import com.wesleytelesbenette.apiinventorymanagement.dtos.CategoryUpdateDto;
 import com.wesleytelesbenette.apiinventorymanagement.models.Category;
-import com.wesleytelesbenette.apiinventorymanagement.models.Product;
 import com.wesleytelesbenette.apiinventorymanagement.repositories.CategoryRepository;
 import com.wesleytelesbenette.apiinventorymanagement.repositories.ProductRepository;
 import jakarta.validation.Valid;
@@ -12,10 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
-
 
 @RestController
 @RequestMapping("/category")
@@ -38,7 +34,7 @@ public class CategoryController
         {
             return (categoryRepository.count() == 0)
                 ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(categoryRepository.findAll());
+                : ResponseEntity.ok(categoryRepository.findAllByOrderByNameAsc());
         }
         catch (Exception e)
         {
@@ -63,7 +59,7 @@ public class CategoryController
         }
     }
 
-    @PostMapping("/{category}")
+    @PostMapping("/{newCategory}")
     public ResponseEntity<Category> createCategory(@PathVariable String newCategory)
     {
         try
@@ -73,8 +69,8 @@ public class CategoryController
 
             Category saveCategory = categoryRepository.save(new Category(newCategory));
             return ResponseEntity
-                    .created(URI.create("/category/" + saveCategory.getId()))
-                    .body(saveCategory);
+                .created(URI.create("/category/" + saveCategory.getId()))
+                .body(saveCategory);
         }
         catch (Exception e)
         {
@@ -96,10 +92,6 @@ public class CategoryController
                     {
                         categoryUpdate.setName(dto.getNewCategory());
                         categoryRepository.save(categoryUpdate);
-
-                        List<Product> productsWithCategory = productRepository.findByCategory(categoryUpdate);
-                        for (Product prod : productsWithCategory) prod.setCategory(categoryUpdate);
-                        productRepository.saveAll(productsWithCategory);
 
                         return ResponseEntity.ok(categoryUpdate);
                     }

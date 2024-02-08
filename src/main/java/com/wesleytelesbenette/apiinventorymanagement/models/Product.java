@@ -1,7 +1,6 @@
 package com.wesleytelesbenette.apiinventorymanagement.models;
 
 import com.wesleytelesbenette.apiinventorymanagement.dtos.ProductCreateDto;
-import com.wesleytelesbenette.apiinventorymanagement.dtos.ProductUpdateDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -47,7 +46,7 @@ public class Product
      */
     @NotNull(message = "A categoria do produto não pode ser nula.")
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "categoryId")
     private Category category;
 
     /**

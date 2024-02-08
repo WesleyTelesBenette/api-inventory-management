@@ -1,6 +1,5 @@
 package com.wesleytelesbenette.apiinventorymanagement.dtos;
 
-import com.wesleytelesbenette.apiinventorymanagement.models.Category;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

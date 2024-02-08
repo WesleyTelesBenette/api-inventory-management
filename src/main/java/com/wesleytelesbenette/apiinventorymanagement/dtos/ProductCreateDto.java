@@ -1,6 +1,5 @@
 package com.wesleytelesbenette.apiinventorymanagement.dtos;
 
-import com.wesleytelesbenette.apiinventorymanagement.models.Category;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 
