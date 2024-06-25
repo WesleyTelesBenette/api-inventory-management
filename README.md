@@ -1,6 +1,11 @@
 # API de Gerenciamento de Estoque
 Um sistema Backend para manipulação de um estoque de produtos (essencialmente de um mercado).
 
+## ⚠️ AVISO
+A aplicação está incompleta, o banco de dados expirou (plano gratuito).
+
+A Aplicação se encontra ***DESATIVADA ❌***!
+
 ## 🍃 Tecnologias utilizadas
 Para criar está solução, foi utilizado as   seguintes tecnologias:
 - Java (v.17.0.10)
